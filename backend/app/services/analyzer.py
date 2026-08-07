@@ -1,6 +1,3 @@
-import re
-
-
 SKILLS = [
     "python",
     "java",
@@ -18,7 +15,18 @@ SKILLS = [
     "github",
     "mongodb",
     "mysql",
-    "javascript"
+    "javascript",
+    "kubernetes"
+]
+
+
+RECOMMENDED_SKILLS = [
+    "docker",
+    "aws",
+    "git",
+    "github",
+    "fastapi",
+    "sql"
 ]
 
 
@@ -36,39 +44,67 @@ def extract_skills(text):
 
 
 
-def calculate_score(text, skills):
+def detect_sections(text):
 
-    score = 0
+    text = text.lower()
 
-    text_lower = text.lower()
-
-
-    # Skills (30 points)
-    skill_score = min(len(skills) * 5, 30)
-    score += skill_score
-
-
-    # Projects (25 points)
-    if "project" in text_lower:
-        score += 25
+    sections = {
+        "education": False,
+        "experience": False,
+        "projects": False,
+        "skills": False,
+        "certifications": False
+    }
 
 
-    # Experience (20 points)
-    if "experience" in text_lower or "internship" in text_lower:
-        score += 20
+    keywords = {
+        "education": ["education", "b.tech", "degree"],
+        "experience": ["experience", "internship", "work"],
+        "projects": ["projects", "project"],
+        "skills": ["skills", "technical skills"],
+        "certifications": ["certification", "certificate"]
+    }
 
 
-    # Education (15 points)
-    if "education" in text_lower or "b.tech" in text_lower:
-        score += 15
+    for section, words in keywords.items():
+        for word in words:
+            if word in text:
+                sections[section] = True
+                break
 
 
-    # Achievements (10 points)
-    if "achievement" in text_lower or "certification" in text_lower:
-        score += 10
+    return sections
 
 
-    return min(score, 100)
+
+def calculate_score(sections, skills):
+
+    breakdown = {}
+
+
+    breakdown["skills"] = min(len(skills) * 5, 30)
+
+    breakdown["projects"] = (
+        25 if sections["projects"] else 0
+    )
+
+    breakdown["experience"] = (
+        20 if sections["experience"] else 0
+    )
+
+    breakdown["education"] = (
+        15 if sections["education"] else 0
+    )
+
+    breakdown["certifications"] = (
+        10 if sections["certifications"] else 0
+    )
+
+
+    total = sum(breakdown.values())
+
+
+    return total, breakdown
 
 
 
@@ -76,30 +112,37 @@ def analyze_resume(text):
 
     skills = extract_skills(text)
 
-    score = calculate_score(
-        text,
+    sections = detect_sections(text)
+
+
+    score, breakdown = calculate_score(
+        sections,
         skills
     )
+
+
+    missing_skills = []
+
+    for skill in RECOMMENDED_SKILLS:
+        if skill not in skills:
+            missing_skills.append(skill)
+
 
 
     suggestions = []
 
 
-    if len(skills) < 5:
+    for section, present in sections.items():
+
+        if not present:
+            suggestions.append(
+                f"Add {section} section"
+            )
+
+
+    if missing_skills:
         suggestions.append(
-            "Add more technical skills"
-        )
-
-
-    if "project" not in text.lower():
-        suggestions.append(
-            "Add detailed project descriptions"
-        )
-
-
-    if "experience" not in text.lower():
-        suggestions.append(
-            "Include internship or experience details"
+            "Consider adding missing technical skills"
         )
 
 
@@ -109,7 +152,17 @@ def analyze_resume(text):
 
 
     return {
+
         "ats_score": score,
+
+        "score_breakdown": breakdown,
+
         "skills_found": skills,
+
+        "missing_skills": missing_skills,
+
+        "sections_detected": sections,
+
         "suggestions": suggestions
+
     }
