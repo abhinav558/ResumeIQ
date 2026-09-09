@@ -1753,6 +1753,11 @@ function ResumeAnalysis() {
     };
   }, [analysis]);
 
+  // Scroll to the top when the component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#050816] text-white">
       {/* Background */}
