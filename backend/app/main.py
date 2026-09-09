@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.resume_library import router as resume_library_router
 from app.api.routes import router as resume_router
+from app.core.config import settings
 from app.db.database import init_db
 
 
@@ -34,11 +35,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:3000",
-    ],
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,3 +53,4 @@ def root():
         "message": "ResumeIQ backend is running",
         "version": "1.0.0",
     }
+
