@@ -20,3 +20,18 @@ build/
 
 # OS
 .DS_Store
+# Local SQLite database
+backend/resumeiq.db
+
+# Local development / backup files
+backend/*_backup.py
+backend/*_before_final_fix.py
+backend/real_resume.txt
+
+backend/**/_backup.py
+backend/**/*_backup.py
+
+# Legacy root-level duplicate modules
+/keyword_db.py
+/patterns.py
+/utils.py
