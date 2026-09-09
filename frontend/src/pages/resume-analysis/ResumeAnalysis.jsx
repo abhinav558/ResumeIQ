@@ -627,16 +627,17 @@ function SectionHeader({ eyebrow, title, description, action, onAction }) {
   );
 }
 
+// PanelLabel - fixed for responsiveness
 function PanelLabel({ title, value, suffix }) {
   return (
-    <div className="flex items-end justify-between gap-4">
-      <div>
-        <p className="text-[9px] font-bold uppercase tracking-wider text-slate-600">
+    <div className="flex items-end justify-between gap-4 min-w-0">
+      <div className="min-w-0 flex-1">
+        <p className="text-[9px] font-bold uppercase tracking-wider text-slate-600 truncate">
           {title}
         </p>
-        <p className="mt-2 text-2xl font-bold text-white">{value}</p>
+        <p className="mt-2 text-2xl font-bold text-white truncate">{value}</p>
       </div>
-      <span className="text-[9px] font-medium text-slate-600">{suffix}</span>
+      <span className="text-[9px] font-medium text-slate-600 shrink-0">{suffix}</span>
     </div>
   );
 }
@@ -2260,18 +2261,17 @@ function ResumeAnalysis() {
             </div>
           </div>
 
+          {/* Section coverage card (RESUME STRUCTURE) - fixed with overflow-hidden and min-w-0 */}
           <div className="mt-5 grid gap-5 lg:grid-cols-2">
-            <div className="rounded-[26px] border border-white/[0.07] bg-[#090f1c] p-6">
-              <div className="flex items-start justify-between">
-                <div>
+            <div className="rounded-[26px] border border-white/[0.07] bg-[#090f1c] p-6 overflow-hidden min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
                   <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-slate-600">
                     Section coverage
                   </p>
-                  <h3 className="mt-2 text-lg font-bold text-white">
-                    Resume structure
-                  </h3>
+                  <h3 className="mt-2 text-lg font-bold text-white">Resume structure</h3>
                 </div>
-                <span className="rounded-xl bg-blue-500/10 px-3 py-2 text-xs font-bold text-blue-400">
+                <span className="rounded-xl bg-blue-500/10 px-3 py-2 text-xs font-bold text-blue-400 shrink-0">
                   {hasValidScore(sectionAnalysis.score)
                     ? clampScore(sectionAnalysis.score).toFixed(0)
                     : "—"}
@@ -2302,6 +2302,23 @@ function ResumeAnalysis() {
                   </div>
                 </div>
               )}
+
+              {/* Experience summary (displayed when no experience section detected) */}
+              {!sectionsPresent.includes("experience") && (
+                <div className="mt-5">
+                  <p className="text-[9px] font-semibold uppercase tracking-wider text-slate-600">
+                    Experience
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <span className="rounded-lg border border-amber-500/10 bg-amber-500/[0.04] px-3 py-2 text-[9px] font-medium text-amber-300/80">
+                      Not detected
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-slate-500 break-words">
+                    No professional experience section was detected in the current resume.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="rounded-[26px] border border-white/[0.07] bg-[#090f1c] p-6">
@@ -2310,9 +2327,7 @@ function ResumeAnalysis() {
                   <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-slate-600">
                     ATS analysis
                   </p>
-                  <h3 className="mt-2 text-lg font-bold text-white">
-                    Scoring context
-                  </h3>
+                  <h3 className="mt-2 text-lg font-bold text-white">Scoring context</h3>
                 </div>
                 <span className="rounded-xl bg-blue-500/10 px-3 py-2 text-xs font-bold text-blue-400">
                   {hasValidScore(ats.keyword_analysis?.score)
