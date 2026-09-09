@@ -9,9 +9,26 @@ import {
 
 const AuthContext = createContext(null);
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  "http://127.0.0.1:8000";
+/*
+|--------------------------------------------------------------------------
+| API configuration
+|--------------------------------------------------------------------------
+|
+| VITE_API_URL is the same environment variable used by
+| frontend/src/services/api.js.
+|
+| Local development:
+|   VITE_API_URL=http://127.0.0.1:8000
+|
+| Production:
+|   VITE_API_URL=https://resumeiq-sopb.onrender.com
+|
+*/
+
+const API_BASE_URL = (
+  import.meta.env.VITE_API_URL ||
+  "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
 const TOKEN_KEY = "resumeiq_access_token";
 const USER_KEY = "resumeiq_user";
@@ -111,9 +128,7 @@ export function AuthProvider({ children }) {
       );
     }
 
-    const nextToken =
-      authResponse.access_token;
-
+    const nextToken = authResponse.access_token;
     const nextUser = authResponse.user;
 
     setToken(nextToken);
@@ -153,6 +168,7 @@ export function AuthProvider({ children }) {
           ...options,
           headers: {
             "Content-Type": "application/json",
+            Accept: "application/json",
             ...(options.headers || {}),
           },
         }
@@ -274,19 +290,32 @@ export function AuthProvider({ children }) {
           {
             method: "GET",
             headers: {
+              Accept: "application/json",
               Authorization: `Bearer ${storedToken}`,
             },
           }
         );
 
-        if (!response.ok) {
-          throw new Error(
-            "Authentication session is no longer valid."
-          );
+        let data = null;
+
+        try {
+          data = await response.json();
+        } catch {
+          data = null;
         }
 
-        const currentUser =
-          await response.json();
+        if (!response.ok) {
+          const message =
+            data?.detail ||
+            "Authentication session is no longer valid.";
+
+          const error = new Error(message);
+          error.status = response.status;
+
+          throw error;
+        }
+
+        const currentUser = data;
 
         if (cancelled) {
           return;
@@ -351,7 +380,6 @@ export function AuthProvider({ children }) {
       user,
       loading,
       isAuthenticated,
-
       login,
       register,
       logout,
@@ -393,3 +421,4 @@ export function useAuth() {
 }
 
 export default AuthContext;
+
