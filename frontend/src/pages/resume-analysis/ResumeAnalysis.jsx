@@ -2605,7 +2605,7 @@ function ResumeAnalysis() {
                   <h3 className="mt-2 text-lg font-bold text-white">
                     No professional experience detected
                   </h3>
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500 break-words">
                     {getDisplayValue(experience.message) ||
                       "Your resume does not currently contain detectable internship or work experience."}
                   </p>
